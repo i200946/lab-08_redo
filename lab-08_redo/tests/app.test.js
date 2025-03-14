@@ -1,6 +1,16 @@
 const request = require('supertest');
 const app = require('../server');
 
+let server; // To store the running server instance
+
+beforeAll(() => {
+    server = app.listen(4000); // Start test server
+});
+
+afterAll((done) => {
+    server.close(done); // Stop the server after tests
+});
+
 describe('User Authentication', () => {
     it('should register a new user', async () => {
         const res = await request(app)
