@@ -1,0 +1,61 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=WebStorm
+
+###
+
+### Register a new user
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password"
+}
+
+### Login with the user
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password"
+}
+
+> {%
+    client.test("Login should return a token", function() {
+        client.assert(response.status === 200, "Expected status 200");
+        client.global.set("auth_token", response.body.token);
+    });
+%}
+
+### Create an event (Requires Auth Token)
+POST http://localhost:3000/events
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "name": "Meeting",
+  "description": "Project discussion",
+  "date": "2025-03-15",
+  "time": "10:00",
+  "category": "Meetings",
+  "reminderMinutes": 10
+}
+
+> {%
+    client.test("Event creation should be successful", function() {
+        client.assert(response.status === 200, "Expected status 200");
+    });
+%}
+
+### Fetch user events
+GET http://localhost:3000/events
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Fetching events should be successful", function() {
+        client.assert(response.status === 200, "Expected status 200");
+        client.assert(response.body.length > 0, "Expected events to be present");
+    });
+%}
